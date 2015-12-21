@@ -1,6 +1,8 @@
 // Written by Andrew Donelick
 // 15 December 2015
 
+// Acquire a string from the gps which specifies a specific latitude
+// and longitude for logging in the data file. 
 
 void getLatitudeString(TinyGPSPlus& gps)
 {

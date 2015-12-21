@@ -73,13 +73,14 @@ boolean turbulence = false;
 
 void setup()
 {  
-    // This sketch uses three serial ports:
+    // This sketch uses four serial ports:
     // Serial is used for debugging and output to computer
     // Serial1 is used for communicating with the radio
-    // Serial2 is used for communicating with the Arduino interfaced with the GPS
+    // Serial2 is used for communicating with the GPS
     // Serial3 is used for communicating with the IMU
 
     // The radio modem (Serial1) requires a baud rate of 1200
+    // The GPS (Serial2) requires a baud rate of 4800
     // The IMU (Serial3) requires a baud ratio of 57600
 
     Serial.begin(115200);
@@ -210,39 +211,11 @@ void loop()
     
     // Now, we have enough information to construct a data packet to send 
     // back to the ground. Build the packet:
-    
-    data[0] = BALLOON; // Source
-    data[1] = REPORT; // Packet type
-    data[2] = NULL; // Not a command, so no command
-    data[3] = interiorTemp1; // signed
-    data[4] = interiorTemp2; // signed
-    data[5] = heaterTemp; // signed
-    data[6] = exteriorTemp; // signed
-    data[7] = humidity; // unsigned
-    data[8] = pressure; // unsigned
-    data[9] = pitch; // signed
-    data[10] = roll; // signed
-    data[11] = yaw; // signed
-    data[12] = (unsigned int) gps.altitude.meters();
-    data[13] = (unsigned int) heaterOn; // unsigned
-    data[14] = (unsigned int) dataLogging; // unsigned
-    data[15] = (unsigned int) manualHeaterControl; //unsigned
-    data[16] = (unsigned int) turbulence; // unsigned
-    data[17] = relayStates; // unsigned
+    buildStatusPacket();
 
     // Check if enough time has passed since the last transmission of a packget.
     // If so, send another status report to the ground.
-    
-    if (radio.timeToSendPacket())
-    {
-        radio.sendData(data, 18);
-        
-        // This delay is included to allow any scrambled sensor 
-        // readings caused by the high power radio transmission 
-        // to settle down.
-        delay(1000);
-    }
-    
+    sendStatusPacket();
     
     // Check if there is an incoming radio transmission
     if (radio.available())
@@ -265,48 +238,11 @@ void loop()
                 // Echo the command to let the operators know it was recieved
                 echoCommand(recievedData[2], recievedData[3]);
                 
-                switch (recievedData[2]) 
-                {
-                    case CHANGE_TRANSMIT_RATE:
-                        // Changes the rate at which data is sent to the ground
-                        radio.setTransmissionDelay((unsigned long) recievedData[3]);
-                        break;
-                    case MANUAL_HEATER_CONTROL:
-                        // Enables (or disables) manual control of heater
-                        manualHeaterControl = (recievedData[3]) ? true : false;
-                        break;
-                    case TURN_HEATER_ON:
-                        heaterOn = true;
-                        break;
-                    case TURN_HEATER_OFF:
-                        heaterOn = false;
-                        break;
-                    case SWITCH_RELAYS:
-                        relays.switchRelays(recievedData[3]);
-                        break;
-                    case CHECK_RADIO_CONNECTION:
-                        // The connection is already echoed
-                        // If any other action are required to do the 
-                        // pre-flight radio check, put them here
-                        break;
-                    default:
-                        // In the default, the command is not recognized.
-                        break;
-                }
+                // Act on the command which was sent
+                processCommand(recievedData[2], recievedData[3]);
             }
         }
     }
-}
-
-
-void echoCommand(unsigned int command, unsigned int commandValue)
-{
-    data[0] = BALLOON; // Source
-    data[1] = COMMAND_RESPONSE; // Packet type
-    data[2] = command; // Command
-    data[3] = commandValue; // Value
-    radio.sendData(data, 4);
-    delay(1000);
 }
 
 
