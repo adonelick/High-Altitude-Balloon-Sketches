@@ -11,6 +11,7 @@
 #include <RelayModule.h>
 #include <PacketRadio.h>
 #include <BalloonCommands.h>
+#include <AttitudeController.h>
 #include "TinyGPS++.h"
 
 // Define the names for the relays
@@ -22,6 +23,11 @@
 // Radio modem pins
 #define DSR 2
 #define RTS 3
+
+// Actuation thresholds for attitude control
+#define PITCH_THRESHOLD 0
+#define ROLL_THRESHOLD 0
+#define YAW_THRESHOLD 0
 
 // Define the threshold for turbulence (units of 0.01 degrees)
 #define TURBULENCE 500
@@ -39,6 +45,7 @@ RazorAHRS razor(Serial3);
 DataFile dataFile(MEGA);
 RelayModule relays(relayPins, 4);
 TinyGPSPlus gps;
+AttitudeController attitudeController(2);
 
 // Create some more variables for the radio communications
 unsigned int data[MAX_BUFFER_LENGTH];
@@ -62,14 +69,23 @@ unsigned int roll;
 unsigned int yaw;
 unsigned int heaterStatus;
 unsigned int relayStates;
+
+// GPS related variables
 unsigned long gpsTime;
 char latitude[LATITUDE_LENGTH];
 char longitude[LONGITUDE_LENGTH];
+unsigned int rawLatitudeDegrees;
+unsigned int rawLongitudeDegrees;
+unsigned long rawLatitudeBillionths;
+unsigned long rawLongitudeBillionths;
+unsigned int rawLatitudeSign;
+unsigned int rawLongitudeSign;
 
 boolean heaterOn = false;
 boolean dataLogging = true;
 boolean manualHeaterControl = false;
 boolean turbulence = false;
+boolean attitudeControl = false;
 
 void setup()
 {  
@@ -92,6 +108,15 @@ void setup()
     relays.begin();
     dataFile.begin();
     radio.begin();
+    
+    attitudeController.setActuatorPins(PITCH, 42, 44);
+    attitudeController.setActuatorPins(ROLL, 46, 48);
+    attitudeController.setActuatorPins(YAW, relayPins[RELAY_1], relayPins[RELAY_2]);
+
+    attitudeController.setActuationThreshold(PITCH, PITCH_THRESHOLD);
+    attitudeController.setActuationThreshold(ROLL, ROLL_THRESHOLD);
+    attitudeController.setActuationThreshold(YAW, YAW_THRESHOLD);
+    attitudeController.begin();
 
     // Set the measurements to be logged in the dataFile
     dataFile.addEntry("Interior Temperature 1");
@@ -178,6 +203,14 @@ void loop()
     
     getLongitudeString(gps);
     dataFile.writeEntry(longitude);
+
+    rawLatitudeDegrees = gps.location.rawLat().deg;
+    rawLatitudeBillionths = gps.location.rawLat().billionths;
+    rawLatitudeSign = gps.location.rawLat().negative ? 0xFFFF : 1;
+    
+    rawLongitudeDegrees = gps.location.rawLng().deg;
+    rawLongitudeBillionths = gps.location.rawLng().billionths;
+    rawLatitudeSign = gps.location.rawLng().negative ? 0xFFFF : 1;
 
     dataFile.close();
 

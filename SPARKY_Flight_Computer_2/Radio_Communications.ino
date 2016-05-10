@@ -9,7 +9,7 @@ void buildStatusPacket()
 {
     data[0] = BALLOON; // Source
     data[1] = REPORT; // Packet type
-    data[2] = NULL; // Not a command, so no command
+    data[2] = 0; // Not a command, so no command
     data[3] = interiorTemp1; // signed
     data[4] = interiorTemp2; // signed
     data[5] = heaterTemp; // signed
@@ -24,7 +24,16 @@ void buildStatusPacket()
     data[14] = (unsigned int) dataLogging; // unsigned
     data[15] = (unsigned int) manualHeaterControl; //unsigned
     data[16] = (unsigned int) turbulence; // unsigned
-    data[17] = relayStates; // unsigned   
+    data[17] = relayStates; // unsigned
+    data[18] = rawLatitudeDegrees;
+    data[19] = (unsigned int) (rawLatitudeBillionths >> 16);
+    data[20] = (unsigned int) (rawLatitudeBillionths & 0xFFFF);
+    data[21] = rawLatitudeSign;
+    data[22] = rawLongitudeDegrees;
+    data[23] = (unsigned int) (rawLongitudeBillionths >> 16);
+    data[24] = (unsigned int) (rawLongitudeBillionths & 0xFFFF);
+    data[25] = rawLongitudeSign;
+    data[26] = (unsigned int) attitudeControl;
 }
 
 
@@ -32,7 +41,7 @@ void sendStatusPacket()
 {
     if (radio.timeToSendPacket())
     {
-        radio.sendData(data, 18);
+        radio.sendData(data, 27);
         
         // This delay is included to allow any scrambled sensor 
         // readings caused by the high power radio transmission 
@@ -78,6 +87,21 @@ void processCommand(unsigned int command, unsigned int commandValue)
             // The connection is already echoed
             // If any other action are required to do the 
             // pre-flight radio check, put them here
+            break;
+        case TURN_ATTITUDE_CONTROL_ON:
+            // Turn the attitude controller on
+            attitudeControl = true;
+            attitudeController.enable();
+            break;
+        case TURN_ATTITUDE_CONTROL_OFF:
+            // Turn the attitude controller off
+            attitudeControl = false;
+            attitudeController.disable();
+            break;
+        case SET_YAW:
+            // Set the desired yaw for the payload
+            // using the attitude controller
+            attitudeController.setDesiredState(0, 0, commandValue);
             break;
         default:
             // In the default, the command is not recognized.
