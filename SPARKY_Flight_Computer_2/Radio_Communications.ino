@@ -1,5 +1,5 @@
 // Written by Andrew Donelick
-// 17 December 2015
+// 16 May 2016
 
 // This file contains functions which deal with transmitting status
 // packets, receiving commands, echoing a received packet, etc.
@@ -101,10 +101,35 @@ void processCommand(unsigned int command, unsigned int commandValue)
         case SET_YAW:
             // Set the desired yaw for the payload
             // using the attitude controller
-            Serial.write((char) commandValue);
+            attitudeSerial.write('Y');
+            sendLongBytes(commandValue);
             break;
+        case SET_P_GAIN:
+            // Set the proportional gain for yaw control
+            attitudeSerial.write('P');
+            sendLongBytes(commandValue);
+            break;
+        case SET_I_GAIN:
+            // Set the integral gain for yaw control
+            attitudeSerial.write('I');
+            sendLongBytes(commandValue);
+            break;
+        case SET_D_GAIN:
+            // Set the derivative gain for yaw control
+            attitudeSerial.write('D');
+            sendLongBytes(commandValue);
         default:
             // In the default, the command is not recognized.
             break;
     }
 }
+
+
+void sendLongBytes(long command)
+{
+    attitudeSerial.write((char) (command >> 24));
+    attitudeSerial.write((char) (command >> 16));
+    attitudeSerial.write((char) (command >> 8));
+    attitudeSerial.write((char) command);
+}
+

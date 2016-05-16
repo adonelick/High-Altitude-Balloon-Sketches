@@ -1,5 +1,5 @@
 // Written by Andrew Donelick
-// 14 December 2015
+// 16 May 2016
 // adonelick@hmc.edu
 
 #include <OneWire.h>
@@ -11,6 +11,7 @@
 #include <RelayModule.h>
 #include <PacketRadio.h>
 #include <BalloonCommands.h>
+#include <SoftwareSerial.h>
 #include "TinyGPS++.h"
 
 // Define the names for the relays
@@ -23,8 +24,10 @@
 #define DSR 2
 #define RTS 3
 
-// Attitude control enabler pin
+// Attitude control pins
 #define ATTITUDE_PIN 24
+#define ATTITUDE_SERIAL_RX 10
+#define ATTITUDE_SERIAL_TX 11
 
 // Actuation thresholds for attitude control
 #define PITCH_THRESHOLD 0
@@ -47,6 +50,7 @@ RazorAHRS razor(Serial3);
 DataFile dataFile(MEGA);
 RelayModule relays(relayPins, 4);
 TinyGPSPlus gps;
+SoftwareSerial attitudeSerial(ATTITUDE_SERIAL_RX, ATTITUDE_SERIAL_TX);
 
 // Create some more variables for the radio communications
 unsigned int data[MAX_BUFFER_LENGTH];
@@ -93,18 +97,21 @@ boolean attitudeControl = false;
 
 void setup()
 {  
-    // This sketch uses four serial ports:
+    // This sketch uses five serial ports:
     // Serial is used for debugging and output to computer
     // Serial1 is used for communicating with the radio
     // Serial2 is used for communicating with the GPS
     // Serial3 is used for communicating with the IMU
+    // attitudeSerial is used for communicated with attitude control system
 
     // The radio modem (Serial1) requires a baud rate of 1200
     // The GPS (Serial2) requires a baud rate of 4800
     // The IMU (Serial3) requires a baud ratio of 57600
+    // The attitude controller (attitudeSerial) requires a baud rate of 9600
 
     Serial.begin(115200);
     Serial2.begin(4800);
+    attitudeSerial.begin(9600);
 
     // Initialize the objects
     razor.begin();
@@ -267,7 +274,7 @@ void loop()
             // not something else we intercepted accidentally
             if ((recievedData[0] == GROUND) && (recievedData[1] == COMMAND) && packetIntact)
             {
-                // Echo the command to let the operators know it was recieved
+                // Echo the command to let the operators know it was received
                 echoCommand(recievedData[2], recievedData[3]);
                 
                 // Act on the command which was sent
