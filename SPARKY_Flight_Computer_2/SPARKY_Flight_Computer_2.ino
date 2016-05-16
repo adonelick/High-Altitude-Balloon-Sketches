@@ -11,7 +11,6 @@
 #include <RelayModule.h>
 #include <PacketRadio.h>
 #include <BalloonCommands.h>
-#include <AttitudeController.h>
 #include "TinyGPS++.h"
 
 // Define the names for the relays
@@ -23,6 +22,9 @@
 // Radio modem pins
 #define DSR 2
 #define RTS 3
+
+// Attitude control enabler pin
+#define ATTITUDE_PIN 24
 
 // Actuation thresholds for attitude control
 #define PITCH_THRESHOLD 0
@@ -45,7 +47,6 @@ RazorAHRS razor(Serial3);
 DataFile dataFile(MEGA);
 RelayModule relays(relayPins, 4);
 TinyGPSPlus gps;
-AttitudeController attitudeController(2);
 
 // Create some more variables for the radio communications
 unsigned int data[MAX_BUFFER_LENGTH];
@@ -67,6 +68,9 @@ unsigned long h;
 unsigned int pitch;
 unsigned int roll;
 unsigned int yaw;
+long longPitch;
+long longRoll;
+long longYaw;
 unsigned int heaterStatus;
 unsigned int relayStates;
 
@@ -108,15 +112,10 @@ void setup()
     relays.begin();
     dataFile.begin();
     radio.begin();
-    
-    attitudeController.setActuatorPins(PITCH, 42, 44);
-    attitudeController.setActuatorPins(ROLL, 46, 48);
-    attitudeController.setActuatorPins(YAW, relayPins[RELAY_1], relayPins[RELAY_2]);
 
-    attitudeController.setActuationThreshold(PITCH, PITCH_THRESHOLD);
-    attitudeController.setActuationThreshold(ROLL, ROLL_THRESHOLD);
-    attitudeController.setActuationThreshold(YAW, YAW_THRESHOLD);
-    attitudeController.begin();
+    // Prepare for attitude control
+    pinMode(ATTITUDE_PIN, OUTPUT);
+    digitalWrite(ATTITUDE_PIN, LOW);
 
     // Set the measurements to be logged in the dataFile
     dataFile.addEntry("Interior Temperature 1");

@@ -91,17 +91,17 @@ void processCommand(unsigned int command, unsigned int commandValue)
         case TURN_ATTITUDE_CONTROL_ON:
             // Turn the attitude controller on
             attitudeControl = true;
-            attitudeController.enable();
+            digitalWrite(ATTITUDE_PIN, HIGH);
             break;
         case TURN_ATTITUDE_CONTROL_OFF:
             // Turn the attitude controller off
             attitudeControl = false;
-            attitudeController.disable();
+            digitalWrite(ATTITUDE_PIN, LOW);
             break;
         case SET_YAW:
             // Set the desired yaw for the payload
             // using the attitude controller
-            attitudeController.setDesiredState(0, 0, commandValue);
+            Serial.write((char) commandValue);
             break;
         default:
             // In the default, the command is not recognized.
