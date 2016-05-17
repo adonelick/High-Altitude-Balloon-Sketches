@@ -118,6 +118,13 @@ void processCommand(unsigned int command, unsigned int commandValue)
             // Set the derivative gain for yaw control
             attitudeSerial.write('D');
             sendLongBytes(commandValue);
+            break;
+        case RESET_ATTITUDE_CONTROLLER:
+            // Send a signal to reset the attitude controlling Arduino
+            digitalWrite(ATTITUDE_RESET_PIN, LOW);
+            delay(10);
+            digitalWrite(ATTITUDE_RESET_PIN, HIGH);
+            break;
         default:
             // In the default, the command is not recognized.
             break;
@@ -127,9 +134,10 @@ void processCommand(unsigned int command, unsigned int commandValue)
 
 void sendLongBytes(long command)
 {
-    attitudeSerial.write((char) (command >> 24));
-    attitudeSerial.write((char) (command >> 16));
-    attitudeSerial.write((char) (command >> 8));
-    attitudeSerial.write((char) command);
+    attitudeSerial.write((char) ((command >> 24)) & 0xFF);
+    attitudeSerial.write((char) ((command >> 16)) & 0xFF);
+    attitudeSerial.write((char) ((command >> 8)) & 0xFF);
+    attitudeSerial.write((char) (command & 0xFF));
 }
+
 

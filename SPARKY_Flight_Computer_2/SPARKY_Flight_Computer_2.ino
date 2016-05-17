@@ -28,6 +28,7 @@
 #define ATTITUDE_PIN 24
 #define ATTITUDE_SERIAL_RX 10
 #define ATTITUDE_SERIAL_TX 11
+#define ATTITUDE_RESET_PIN 41
 
 // Actuation thresholds for attitude control
 #define PITCH_THRESHOLD 0
@@ -122,7 +123,9 @@ void setup()
 
     // Prepare for attitude control
     pinMode(ATTITUDE_PIN, OUTPUT);
+    pinMode(ATTITUDE_RESET_PIN, OUTPUT);
     digitalWrite(ATTITUDE_PIN, LOW);
+    digitalWrite(ATTITUDE_RESET_PIN, HIGH);
 
     // Set the measurements to be logged in the dataFile
     dataFile.addEntry("Interior Temperature 1");
@@ -216,7 +219,7 @@ void loop()
     
     rawLongitudeDegrees = gps.location.rawLng().deg;
     rawLongitudeBillionths = gps.location.rawLng().billionths;
-    rawLatitudeSign = gps.location.rawLng().negative ? 0xFFFF : 1;
+    rawLongitudeSign = gps.location.rawLng().negative ? 1 : 0xFFFF;
 
     dataFile.close();
 
@@ -283,7 +286,5 @@ void loop()
         }
     }
 }
-
-
 
 
