@@ -1,3 +1,5 @@
+// Written by Andrew Donelick
+// adonelick@hmc.edu
 
 void processSerial()
 {

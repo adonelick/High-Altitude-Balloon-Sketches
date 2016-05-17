@@ -1,3 +1,6 @@
+// Written by Andrew Donelick
+// adonelick@hmc.edu
+
 #include <AttitudeController.h>
 #include <RazorAHRS.h>
 #include <SoftwareSerial.h>
