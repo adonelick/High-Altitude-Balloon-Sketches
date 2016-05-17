@@ -9,7 +9,7 @@
 #define DSR 3
 
 // Initialize the radio modem
-PacketRadio radio(Serial1, DSR, RTS);
+PacketRadio radio(Serial1, DSR, RTS, 0);
 
 // The communication protocol for my packet radio system:
 //    _packet source_ (GROUND, BALLOON)
@@ -39,7 +39,7 @@ void setup()
   // Initialize the radio's serial port here - it
   // is not initialized in the PacketRadio class
   Serial.begin(115200);
-  Serial1.begin(1200);
+  radio.begin();
 }
 
 
