@@ -27,7 +27,7 @@ AttitudeController attitudeController(100);
 // Properties of the attitude controller
 long proportionalGain = 50;
 long integralGain = 0;
-long derivativeGain = 10;
+long derivativeGain = 20;
 
 // Variables which hold the current and desired attitude values
 long desiredYaw;
@@ -62,7 +62,6 @@ void setup() {
   
     attitudeController.setDesiredState(0, 0, 0);
     attitudeController.begin();
-    attitudeController.enable();
 }
 
 void loop() {
@@ -78,6 +77,7 @@ void loop() {
     } else {
       attitudeController.disable();
     }
+    
   
     // Decode the most recent attitude data from the AHRS
     if (razor.available()) {
@@ -91,7 +91,6 @@ void loop() {
   
     // Use the attitude controller to control the payload's yaw
     // (right now we only control the yaw of the payload)
-    attitudeController.setDesiredState(0, 0, desiredYaw);
     attitudeController.updateState(pitch, roll, yaw, millis());
     attitudeController.updateErrors();
     attitudeController.updateActuators();
