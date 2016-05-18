@@ -103,21 +103,25 @@ void processCommand(unsigned int command, unsigned int commandValue)
             // using the attitude controller
             attitudeSerial.write('Y');
             sendLongBytes(commandValue);
+            desiredYaw = (long) commandValue;
             break;
         case SET_P_GAIN:
             // Set the proportional gain for yaw control
             attitudeSerial.write('P');
             sendLongBytes(commandValue);
+            pGain = (unsigned int) commandValue;
             break;
         case SET_I_GAIN:
             // Set the integral gain for yaw control
             attitudeSerial.write('I');
             sendLongBytes(commandValue);
+            iGain = (unsigned int) commandValue;
             break;
         case SET_D_GAIN:
             // Set the derivative gain for yaw control
             attitudeSerial.write('D');
             sendLongBytes(commandValue);
+            dGain = (unsigned int) commandValue;
             break;
         case RESET_ATTITUDE_CONTROLLER:
             // Send a signal to reset the attitude controlling Arduino

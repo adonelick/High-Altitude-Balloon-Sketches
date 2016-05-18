@@ -36,7 +36,7 @@
 #define YAW_THRESHOLD 0
 
 // Define the threshold for turbulence (units of 0.01 degrees)
-#define TURBULENCE 500
+#define TURBULENCE 1000
 
 #define LATITUDE_LENGTH 50
 #define LONGITUDE_LENGTH 50
@@ -90,14 +90,22 @@ unsigned long rawLongitudeBillionths;
 unsigned int rawLatitudeSign;
 unsigned int rawLongitudeSign;
 
+// Control variables
 boolean heaterOn = false;
 boolean dataLogging = true;
 boolean manualHeaterControl = false;
 boolean turbulence = false;
 boolean attitudeControl = false;
+long desiredYaw = 0;
+unsigned int pGain = 50;
+unsigned int iGain = 0;
+unsigned int dGain = 20;
 
 void setup()
-{  
+{
+    // Load the saved settings from the SD card
+    loadSettings();
+    
     // This sketch uses five serial ports:
     // Serial is used for debugging and output to computer
     // Serial1 is used for communicating with the radio
@@ -250,6 +258,10 @@ void loop()
     // Since we may have just switched the heater on or off, update
     // the relayStates measurement
     relayStates = relays.getRelayStates();
+
+    // Save the current settings to a file which can be read in the 
+    // event that the flight computer is reset while running
+    saveSettings();
     
     // Now, we have enough information to construct a data packet to send 
     // back to the ground. Build the packet:
