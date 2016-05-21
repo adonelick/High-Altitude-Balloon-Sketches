@@ -4,7 +4,6 @@
 // This file contains functions which deal with transmitting status
 // packets, receiving commands, echoing a received packet, etc.
 
-
 void buildStatusPacket()
 {
     data[0] = BALLOON; // Source
@@ -92,11 +91,13 @@ void processCommand(unsigned int command, unsigned int commandValue)
             // Turn the attitude controller on
             attitudeControl = true;
             digitalWrite(ATTITUDE_PIN, HIGH);
+            relays.switchRelayOn(RELAY_3);
             break;
         case TURN_ATTITUDE_CONTROL_OFF:
             // Turn the attitude controller off
             attitudeControl = false;
             digitalWrite(ATTITUDE_PIN, LOW);
+            relays.switchRelayOff(RELAY_3);
             break;
         case SET_YAW:
             // Set the desired yaw for the payload

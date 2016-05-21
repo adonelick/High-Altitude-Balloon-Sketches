@@ -102,10 +102,7 @@ unsigned int iGain = 0;
 unsigned int dGain = 20;
 
 void setup()
-{
-    // Load the saved settings from the SD card
-    loadSettings();
-    
+{   
     // This sketch uses five serial ports:
     // Serial is used for debugging and output to computer
     // Serial1 is used for communicating with the radio
@@ -152,6 +149,9 @@ void setup()
     dataFile.addEntry("Latitude");
     dataFile.addEntry("Longitude");
     dataFile.writeFileHeader();
+
+    // Load the saved settings from the SD card
+    loadSettings();
 }
 
 
@@ -183,8 +183,7 @@ void loop()
     
     // Read values from the GPS, including the most current time,
     // current lattitude and longitude, and altitude
-    while (Serial2.available() > 0)
-    {
+    while (Serial2.available() > 0) {
         gps.encode(Serial2.read());
     }
         
@@ -237,13 +236,10 @@ void loop()
     // Check if the internal temperature of the module has dropped
     // sufficiently to warrant turning the heater on. If it is getting a little
     // warm, turn the heater off.
-    if (!manualHeaterControl)
-    {
-        if ((sensors.bmp085GetTemperature() < 0.0) && (!heaterOn))
-        {
+    if (!manualHeaterControl) {
+        if ((sensors.bmp085GetTemperature() < 0.0) && (!heaterOn)) {
             heaterOn = true;
-        } 
-        else if ((sensors.bmp085GetTemperature() > 2.0) && heaterOn) {
+        } else if ((sensors.bmp085GetTemperature() > 2.0) && heaterOn) {
             heaterOn = false;
         }
     }
