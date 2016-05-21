@@ -231,7 +231,7 @@ void loop()
     dataFile.close();
 
     // Determine if we are experiencing turbulence
-    turbulence = turbulence || (abs((int)roll) > TURBULENCE) || (abs((int)pitch) > TURBULENCE);
+    turbulence = (abs((int)roll) > TURBULENCE) || (abs((int)pitch) > TURBULENCE);
 
     // Check if the internal temperature of the module has dropped
     // sufficiently to warrant turning the heater on. If it is getting a little

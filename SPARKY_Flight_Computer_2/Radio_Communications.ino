@@ -80,7 +80,10 @@ void processCommand(unsigned int command, unsigned int commandValue)
             heaterOn = false;
             break;
         case SWITCH_RELAYS:
-            relays.switchRelays(commandValue);
+            // Switch the relays, but only allow manual control over
+            // relays 1 and 2, as 3 and 4 are in use for other things
+            relayStates = (commandValue & 0x0003) | (relayStates & 0x000C);
+            relays.switchRelays(relayStates);
             break;
         case CHECK_RADIO_CONNECTION:
             // The connection is already echoed
