@@ -77,7 +77,6 @@ void loop() {
     } else {
       attitudeController.disable();
     }
-    
   
     // Decode the most recent attitude data from the AHRS
     if (razor.available()) {
@@ -92,8 +91,7 @@ void loop() {
     // Use the attitude controller to control the payload's yaw
     // (right now we only control the yaw of the payload)
     attitudeController.updateState(pitch, roll, yaw, millis());
-    attitudeController.updateErrors();
     attitudeController.updateActuators();
   
-    delay(50);
+    delay(10);
 }

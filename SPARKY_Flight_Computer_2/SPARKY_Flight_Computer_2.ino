@@ -78,6 +78,8 @@ long longRoll;
 long longYaw;
 unsigned int heaterStatus;
 unsigned int relayStates;
+boolean turbulence = false;
+boolean dataLogging = true;
 
 // GPS related variables
 unsigned long gpsTime;
@@ -92,14 +94,16 @@ unsigned int rawLongitudeSign;
 
 // Control variables
 boolean heaterOn = false;
-boolean dataLogging = true;
 boolean manualHeaterControl = false;
-boolean turbulence = false;
 boolean attitudeControl = false;
 long desiredYaw = 0;
 unsigned int pGain = 50;
 unsigned int iGain = 0;
 unsigned int dGain = 20;
+
+// Timing variables
+unsigned long turbulenceResetTime = 0;
+unsigned long turbulenceDelay = 5000;
 
 void setup()
 {   
@@ -231,7 +235,11 @@ void loop()
     dataFile.close();
 
     // Determine if we are experiencing turbulence
-    turbulence = (abs((int)roll) > TURBULENCE) || (abs((int)pitch) > TURBULENCE);
+    turbulence = turbulence || (abs((int)roll) > TURBULENCE) || (abs((int)pitch) > TURBULENCE);
+    if ((millis() - turbulenceResetTime) > turbulenceDelay) {
+        turbulenceResetTime = millis();
+        turbulence = false;
+    }
 
     // Check if the internal temperature of the module has dropped
     // sufficiently to warrant turning the heater on. If it is getting a little
