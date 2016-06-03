@@ -61,7 +61,6 @@ unsigned int recievedData[MAX_BUFFER_LENGTH];
 unsigned int recievedDataLength;
 boolean packetIntact;
 
-
 // Variables to hold all of the data measurements
 unsigned int interiorTemp1;
 unsigned int interiorTemp2;
@@ -116,7 +115,7 @@ void setup()
 
     // The radio modem (Serial1) requires a baud rate of 1200
     // The GPS (Serial2) requires a baud rate of 4800
-    // The IMU (Serial3) requires a baud ratio of 57600
+    // The IMU (Serial3) requires a baud rate of 57600
     // The attitude controller (attitudeSerial) requires a baud rate of 9600
 
     Serial.begin(115200);
@@ -271,7 +270,7 @@ void loop()
     // back to the ground. Build the packet:
     buildStatusPacket();
 
-    // Check if enough time has passed since the last transmission of a packget.
+    // Check if enough time has passed since the last transmission of a packet.
     // If so, send another status report to the ground.
     sendStatusPacket();
     
