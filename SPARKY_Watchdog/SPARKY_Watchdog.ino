@@ -19,7 +19,7 @@ void loop()
     if ((millis() - lastResetTime) > delayTime)
     {
         digitalWrite(RESET_PIN, LOW);
-        delay(10);
+        delay(50);
         digitalWrite(RESET_PIN, HIGH);
         lastResetTime = millis();
     }
