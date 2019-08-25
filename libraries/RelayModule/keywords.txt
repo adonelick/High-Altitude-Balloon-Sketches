@@ -1,0 +1,31 @@
+#######################################
+# Syntax Coloring Map For RelayModule
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+RelayModule	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+switchRelayOn	KEYWORD2
+switchRelayOff	KEYWORD2
+getRelayStates	KEYWORD2
+getRelayState	KEYWORD2
+switchRelays	KEYWORD2
+
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

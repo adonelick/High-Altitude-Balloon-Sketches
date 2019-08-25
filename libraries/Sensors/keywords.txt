@@ -1,0 +1,39 @@
+#######################################
+# Syntax Coloring Map For Sensors
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Sensors	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+getAnalogHumidity	KEYWORD2
+getAnalogTemperature	KEYWORD2
+getDigitalTemperature	KEYWORD2
+bmp085GetTemperature	KEYWORD2
+bmp085GetPressure	KEYWORD2
+getAltitude	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+ANALOG_HUMIDITY	LITERAL1
+INTERNAL_TEMP	LITERAL1
+HEATER_TEMP	LITERAL1
+EXTERNAL_TEMP	LITERAL1
+ANALOG_INTERIOR_OFFSET	LITERAL1
+HEATER_OFFSET	LITERAL1
+
+

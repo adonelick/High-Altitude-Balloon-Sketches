@@ -1,0 +1,37 @@
+#######################################
+# Syntax Coloring Map For PacketRadio
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+PacketRadio	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+available	KEYWORD2
+setTransmissionDelay	KEYWORD2
+timeToSendPacket	KEYWORD2
+sendData	KEYWORD2
+recieveData	KEYWORD2
+processData	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+GROUND	LITERAL1
+BALLOON	LITERAL1
+REPORT	LITERAL1
+COMMAND	LITERAL1
+COMMAND_RESPONSE	LITERAL1
+MAX_BUFFER_LENGTH	LITERAL1

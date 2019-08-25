@@ -1,0 +1,37 @@
+#######################################
+# Syntax Coloring Map For AttitudeController
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+AttitudeController	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+enable	KEYWORD2
+disable	KEYWORD2
+setActuatorPins	KEYWORD2
+setActuationThreshold	KEYWORD2
+getActuation	KEYWORD2
+setGains	KEYWORD2
+updateState	KEYWORD2
+updateActuators	KEYWORD2
+setDesiredState	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+PITCH	LITERAL1
+ROLL	LITERAL1
+YAW 	LITERAL1

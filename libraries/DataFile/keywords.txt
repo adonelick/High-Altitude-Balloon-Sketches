@@ -1,0 +1,32 @@
+#######################################
+# Syntax Coloring Map For DataFile
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+DataFile	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+open	KEYWORD2
+close	KEYWORD2
+addEntry	KEYWORD2
+writeFileHeader	KEYWORD2
+writeEntry	KEYWORD2
+checkStatus	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+UNO	LITERAL1
+MEGA	LITERAL1
