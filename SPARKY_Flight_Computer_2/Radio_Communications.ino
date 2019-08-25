@@ -33,6 +33,10 @@ void buildStatusPacket()
     data[24] = (unsigned int) (rawLongitudeBillionths & 0xFFFF);
     data[25] = rawLongitudeSign;
     data[26] = (unsigned int) attitudeControl;
+    data[27] = (unsigned int) (gpsSentences >> 16);
+    data[28] = (unsigned int) (gpsSentences & 0xFFFF);
+    data[29] = (unsigned int) (failedSentences >> 16);
+    data[30] = (unsigned int) (failedSentences & 0xFFFF);
 }
 
 
@@ -40,7 +44,7 @@ void sendStatusPacket()
 {
     if (radio.timeToSendPacket())
     {
-        radio.sendData(data, 27);
+        radio.sendData(data, 31);
         
         // This delay is included to allow any scrambled sensor 
         // readings caused by the high power radio transmission 

@@ -90,6 +90,8 @@ unsigned long rawLatitudeBillionths;
 unsigned long rawLongitudeBillionths;
 unsigned int rawLatitudeSign;
 unsigned int rawLongitudeSign;
+unsigned long gpsSentences;
+unsigned long failedSentences;
 
 // Control variables
 boolean heaterOn = false;
@@ -106,6 +108,11 @@ unsigned long turbulenceDelay = 5000;
 
 void setup()
 {   
+
+    pinMode(RTS, OUTPUT);
+    digitalWrite(RTS, LOW);
+
+    
     // This sketch uses five serial ports:
     // Serial is used for debugging and output to computer
     // Serial1 is used for communicating with the radio
@@ -160,6 +167,7 @@ void setup()
 
 void loop()
 {
+    
     // Collect measurements from the instruments and write them
     // to the data file. Note: entries muse be written in the same
     // order as they were listed in the setup!
@@ -189,6 +197,8 @@ void loop()
     while (Serial2.available() > 0) {
         gps.encode(Serial2.read());
     }
+    gpsSentences = gps.sentencesWithFix();
+    failedSentences = gps.failedChecksum();
         
     h = (unsigned long) gps.altitude.value();
     dataFile.writeEntry(h);
