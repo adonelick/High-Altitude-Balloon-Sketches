@@ -95,7 +95,6 @@ void DataFile::writeFileHeader()
     {
         for (int i = 0; i < numEntries_; ++i)
         {
-            dataFile_.print("Time,");
             dataFile_.print(entries_[i]);
 
             if (i != numEntries_ - 1)
@@ -110,41 +109,11 @@ void DataFile::writeFileHeader()
     }
 }
 
-void DataFile::writeEntry(int value)
-{
-    if (!dataFile_)
-        return;
-    writeEntryTime();
-    dataFile_.print(value);
-    dataFile_.flush();
-    writeEntryEnd();
-}
-
-void DataFile::writeEntry(unsigned int value)
-{
-    if (!dataFile_)
-        return;
-    writeEntryTime();
-    dataFile_.print(value);
-    dataFile_.flush();
-    writeEntryEnd();
-}
-
-void DataFile::writeEntry(unsigned long value)
-{
-    if (!dataFile_)
-        return;
-    writeEntryTime();
-    dataFile_.print(value);
-    dataFile_.flush();
-    writeEntryEnd();
-}
-
 void DataFile::writeEntry(float value)
 {
     if (!dataFile_)
         return;
-    writeEntryTime();
+
     dataFile_.print(value);
     dataFile_.flush();
     writeEntryEnd();
@@ -154,7 +123,7 @@ void DataFile::writeEntry(double value)
 {
     if (!dataFile_)
         return;
-    writeEntryTime();
+
     dataFile_.print(value);
     dataFile_.flush();
     writeEntryEnd();
@@ -165,7 +134,6 @@ void DataFile::writeEntry(bool value)
     if (!dataFile_)
         return;
 
-    writeEntryTime();
     if (value) {
         dataFile_.print("True");
     } else {
@@ -179,23 +147,71 @@ void DataFile::writeEntry(char const* value)
 {
     if (!dataFile_)
         return;
-    writeEntryTime();
+
     dataFile_.print(value);
     dataFile_.flush();
     writeEntryEnd();
 }
 
-
-void DataFile::writeEntryTime()
+void DataFile::writeEntry(uint8_t value)
 {
     if (!dataFile_)
         return;
 
-    dataFile_.print(millis());
-    dataFile_.print(',');
+    dataFile_.print(value);
     dataFile_.flush();
+    writeEntryEnd();
 }
 
+void DataFile::writeEntry(uint16_t value)
+{
+    if (!dataFile_)
+        return;
+
+    dataFile_.print(value);
+    dataFile_.flush();
+    writeEntryEnd();
+}
+
+void DataFile::writeEntry(uint32_t value)
+{
+    if (!dataFile_)
+        return;
+
+    dataFile_.print(value);
+    dataFile_.flush();
+    writeEntryEnd();
+}
+
+void DataFile::writeEntry(int8_t value)
+{
+    if (!dataFile_)
+        return;
+
+    dataFile_.print(value);
+    dataFile_.flush();
+    writeEntryEnd();
+}
+
+void DataFile::writeEntry(int16_t value)
+{
+    if (!dataFile_)
+        return;
+
+    dataFile_.print(value);
+    dataFile_.flush();
+    writeEntryEnd();
+}
+
+void DataFile::writeEntry(int32_t value)
+{
+    if (!dataFile_)
+        return;
+
+    dataFile_.print(value);
+    dataFile_.flush();
+    writeEntryEnd();
+}
 
 void DataFile::writeEntryEnd()
 {

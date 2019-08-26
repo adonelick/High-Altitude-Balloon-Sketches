@@ -69,13 +69,16 @@ class DataFile
         void writeFileHeader();
 
         // Writes a new entry to the datafile (for many types of data)
-        void writeEntry(int value);
-        void writeEntry(unsigned int value);
-        void writeEntry(unsigned long value);
         void writeEntry(float value);
         void writeEntry(double value);
         void writeEntry(bool value);
         void writeEntry(char const* value);
+        void writeEntry(uint8_t value);
+        void writeEntry(uint16_t value);
+        void writeEntry(uint32_t value);
+        void writeEntry(int8_t value);
+        void writeEntry(int16_t value);
+        void writeEntry(int32_t value);
 
         // Checks the status of the data file (whether or not is successfully
         // opened and it working)
@@ -94,10 +97,6 @@ class DataFile
         void writeNewLine();
 
     private:
-
-        // Writes the time the entry was made (in milliseconds since the 
-        // Arduino started running)
-        void writeEntryTime();
 
         // Writes either a comma or newline after an entry, depending
         // on whether the entry was the last in the line, or not
