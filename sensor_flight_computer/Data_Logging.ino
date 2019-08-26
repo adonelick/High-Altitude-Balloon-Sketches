@@ -1,8 +1,22 @@
+/**
+ * Written by Andrew Donelick
+ * adonelick@hmc.edu
+ */
+
+/**
+ * This function writes the header of the data file to 
+ * the SD card installed on the sensor computer. 
+ * 
+ * :param file: Reference to the DataFile object
+ * 
+ * :return: None
+ */
 void setupFileEntries(DataFile& file)
 {
     /* Set the measurements to be logged in the dataFile */
     file.addEntry("Interior Temperature 1");
     file.addEntry("Interior Temperature 2");
+    file.addEntry("Interior Temperature 3");
     file.addEntry("Exterior Temperature");
     file.addEntry("Pressure");
     file.addEntry("Humidity");
@@ -21,15 +35,18 @@ void setupFileEntries(DataFile& file)
     file.addEntry("Roll");
     file.addEntry("Yaw");
     
-    file.addEntry("GPS Time");
-    file.addEntry("GPS Sentences");
-    file.addEntry("GPS Failed Sentences");
-    file.addEntry("Number of Satellites");
+    file.addEntry("GPS Year");
+    file.addEntry("GPS Month");
+    file.addEntry("GPS Date");
+    file.addEntry("GPS Hour");
+    file.addEntry("GPS Minute");
+    file.addEntry("GPS Second");
     file.addEntry("Latitude");
     file.addEntry("Longitude");
     file.addEntry("Altitude");
-    file.addEntry("Ascent Rate");
     file.addEntry("Speed");
+    file.addEntry("Heading");
+    file.addEntry("Number of Satellites");
 
     file.addEntry("Battery Voltage");
     file.addEntry("Radio Transmission");
@@ -40,6 +57,7 @@ void logData(DataFile& file)
 {
     file.writeEntry(interiorTemperature1);
     file.writeEntry(interiorTemperature2);
+    file.writeEntry(interiorTemperature3);
     file.writeEntry(exteriorTemperature);
     file.writeEntry(pressure);
     file.writeEntry(humidity);
@@ -58,17 +76,19 @@ void logData(DataFile& file)
     file.writeEntry(roll);
     file.writeEntry(yaw);
 
-    file.writeEntry(gpsTime);
-    file.writeEntry(gpsSentences);
-    file.writeEntry(failedSentences);
-    file.writeEntry(numSatellites);
+    file.writeEntry(year);
+    file.writeEntry(month);
+    file.writeEntry(date);
+    file.writeEntry(hour);
+    file.writeEntry(minute);
+    file.writeEntry(second);
     file.writeEntry(latitude);
     file.writeEntry(longitude);
-    file.writeEntry(rawAltitude / 100.0);
-    file.writeEntry(ascentRate);
-    file.writeEntry(payloadSpeed);
+    file.writeEntry(altitude);
+    file.writeEntry(speed);
+    file.writeEntry(heading);
+    file.writeEntry(satellites);
 
     file.writeEntry(batteryVoltage);
     file.writeEntry(radioTransmitting);
 }
-

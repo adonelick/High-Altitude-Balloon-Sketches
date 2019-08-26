@@ -1,3 +1,9 @@
+/**
+ * Written by Andrew Donelick
+ * adonelick@hmc.edu
+ */
+
+#include <Arduino.h>
 #include <OneWire.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -5,23 +11,26 @@
 #include <SparkFunLSM9DS1.h>
 #include <SparkFunMPL3115A2.h>
 #include <SparkFun_HIH4030.h>
+#include "SparkFun_Si7021_Breakout_Library.h"
 #include <DataFile.h>
-#include "TinyGPS++.h"
+
+#define DEBUG_DATA true
+#define DEBUG_PORT Serial
+#define COMM_COMPUTER_PORT Serial1
 
 /* Calibration constants */
-#define VOLTAGE_ADJUSTMENT 1.046
-#define RATE_X -0.1368
-#define RATE_Y -2.423
-#define RATE_Z 0.03344
+#define VOLTAGE_ADJUSTMENT 1.0
+#define RATE_X 0.0
+#define RATE_Y 0.0
+#define RATE_Z 0.0
 
 /* Digital pin definitions */
-#define TRANSMISSION_PIN 3
-#define TEMPERATURE_PIN_EXTERIOR 6
-#define TEMPERATURE_PIN_INTERIOR 7
+#define TRANSMISSION_PIN 35
+#define TEMPERATURE_PIN_EXTERIOR 3
+#define TEMPERATURE_PIN_INTERIOR 2
 
 /* Analog pin definitions */
-#define HUMIDITY_PIN A5
-#define VOLTAGE_PIN A8
+#define VOLTAGE_PIN A15
 
 #define DATA_LENGTH 1000
 #define LATITUDE_LENGTH 50
@@ -32,7 +41,7 @@ byte data[DATA_LENGTH];
 unsigned int numBytes;
 
 /* Humidity related variables */
-HIH4030 humiditySensor(HUMIDITY_PIN, 5);
+Weather humidity_sensor;
 float humidity;
 
 /* Pressure related variables */
@@ -47,28 +56,25 @@ OneWire ds_exterior(TEMPERATURE_PIN_EXTERIOR);
 OneWire ds_interior(TEMPERATURE_PIN_INTERIOR);
 float interiorTemperature1;
 float interiorTemperature2;
+float interiorTemperature3;
 float exteriorTemperature;
 
 /* GPS related variables */
+#define GPS_PORT Serial2
+#define GPS_SERIAL_TIMEOUT 2000
 #define GPS_WARNING_AGE 10000
-TinyGPSPlus gps;
-unsigned long gpsTime;
-unsigned long gpsDate;
-char latitude[LATITUDE_LENGTH];
-char longitude[LONGITUDE_LENGTH];
-unsigned long rawAltitude;
-float altitude;
-unsigned int rawLatitudeDegrees;
-unsigned int rawLongitudeDegrees;
-unsigned long rawLatitudeBillionths;
-unsigned long rawLongitudeBillionths;
-byte rawLatitudeSign;
-byte rawLongitudeSign;
-boolean gpsValidity;
-unsigned long gpsSentences;
-unsigned long failedSentences;
-unsigned int numSatellites;
-float payloadSpeed;
+uint8_t year;       /* Current year [00 - 99] */
+uint8_t month;      /* Current month [01 - 12] */
+uint8_t date;       /* Current date of month [01 - 31] */
+uint8_t hour;       /* Current hour [0 - 23] */
+uint8_t minute;     /* Current minute [0 - 59] */
+uint8_t second;     /* Current second [0 - 59] */
+int32_t latitude;   /* Latitude of the payload [] */
+int32_t longitude;  /* Longitude of the payload [] */
+int32_t altitude;   /* Altitude of the payload [cm] */
+uint32_t speed;     /* Speed of the payload [meter/hour] */
+uint16_t heading;   /* Heading of the payload [hundredths of degrees] */
+uint8_t satellites; /* Number of satellites for the GPS */
 
 /* Ascent rate variables */
 float ascentRate;
@@ -81,7 +87,7 @@ float ascentRateHistory[ASCENT_RATE_VALUES];
 
 /* IMU related variables */
 #define LSM9DS1_M    0x1E // Would be 0x1C if SDO_M is LOW
-#define LSM9DS1_AG  0x6B // Would be 0x6A if SDO_AG is LOW
+#define LSM9DS1_AG   0x6B // Would be 0x6A if SDO_AG is LOW
 #define DECLINATION -14.32
 LSM9DS1 imu;
 float ax;
@@ -103,7 +109,7 @@ unsigned long previousReportTime = 0;
 unsigned long resetTime;
 
 /* Data logging related variables */
-#define SD_CHIP_SELECT 23
+#define SD_CHIP_SELECT 25
 #define SD_CARD_DETECT 45
 #define RESET_INTERVAL 600000
 #define TOTAL_DATA_FILENAME "DATA.CSV"
@@ -118,9 +124,9 @@ boolean radioTransmitting;
 void setup() 
 {   
     /* Start the serial communication lines */
-    Serial.begin(115200);
-    Serial1.begin(9600);
-    Serial2.begin(4800);
+    DEBUG_PORT.begin(115200);
+    COMM_COMPUTER_PORT.begin(9600);
+    GPS_PORT.begin(4800);
 
     /* Start the I2C bus */
     Wire.begin();
@@ -143,7 +149,6 @@ void setup()
     pinMode(TRANSMISSION_PIN, INPUT);
     pinMode(TEMPERATURE_PIN_INTERIOR, INPUT);
     pinMode(TEMPERATURE_PIN_EXTERIOR, INPUT);
-    pinMode(HUMIDITY_PIN, INPUT);
     pinMode(VOLTAGE_PIN, INPUT);
 
 
@@ -179,7 +184,9 @@ void loop()
     /* Read the data from each of the temperature sensors */
     interiorTemperature1 = getTemperature(ds_interior);
     radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
-    interiorTemperature2 = pressureSensor.readTemp();
+    interiorTemperature2 = deg_C_to_F(pressureSensor.readTemp());
+    radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
+    interiorTemperature3 = humidity_sensor.getTempF();
     radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
     exteriorTemperature = getTemperature(ds_exterior);
     radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
@@ -189,40 +196,17 @@ void loop()
     radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
 
     /* Read the data from the humidity sensor */
-    humidity = humiditySensor.getTrueRH(interiorTemperature1);
+    humidity = humidity_sensor.getRH();
     radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
 
     /** 
      * Read values from the GPS, including the most current time,
      * current lattitude and longitude, and altitude
      */
-    while (Serial2.available() > 0) {
-        gps.encode(Serial2.read());
-    }
+    get_GPS_data();
     radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
-
-    gpsValidity = (gps.time.age() < GPS_WARNING_AGE);
-    gpsSentences = gps.sentencesWithFix();
-    failedSentences = gps.failedChecksum();
-    numSatellites = gps.satellites.value();
-    gpsTime = (unsigned long) gps.time.value();
-    gpsDate = (unsigned long) gps.date.value();
-
-    getLatitudeString(gps);
-    getLongitudeString(gps);
-    rawAltitude = gps.altitude.value();
-    altitude = rawAltitude / 100.0;
-
-    rawLatitudeDegrees = gps.location.rawLat().deg;
-    rawLatitudeBillionths = gps.location.rawLat().billionths;
-    rawLatitudeSign = gps.location.rawLat().negative ? 0xFF : 1;
-    
-    rawLongitudeDegrees = gps.location.rawLng().deg;
-    rawLongitudeBillionths = gps.location.rawLng().billionths;
-    rawLongitudeSign = gps.location.rawLng().negative ? 0xFF : 1;
-
     getAscentRate();
-    payloadSpeed = gps.speed.mps();
+
 
     /* Update the IMU sensor readings */
     if ( imu.gyroAvailable() ) {
@@ -274,9 +258,14 @@ void loop()
     if (millis() - previousReportTime >= dataReportInterval)
     {
         numBytes = buildPacket(data);
-        Serial1.write(data, numBytes);
+        COMM_COMPUTER_PORT.write(data, numBytes);
         
         displayData();
         previousReportTime = millis();
+    }
+
+    if (DEBUG_DATA)
+    {
+        displayData();
     }
 }

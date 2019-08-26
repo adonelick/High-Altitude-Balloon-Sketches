@@ -6,7 +6,7 @@
 
 /**
  * This function contained returns the temperature 
- * from one DS18S20 in degrees Celsius. You need to specify
+ * from one DS18S20 in degrees Fahrenheit. You need to specify
  * the OneWire instance associated with the temperature sensor.
  * 
  * :param ds: OneWire instance associated with the sensor
@@ -59,5 +59,5 @@ float getTemperature(OneWire& ds)
     float tempRead = ((MSB << 8) | LSB); 
     float temperatureSum = tempRead / 16;
     
-    return temperatureSum;
+    return deg_C_to_F(temperatureSum);
 }

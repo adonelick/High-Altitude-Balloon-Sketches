@@ -14,6 +14,7 @@ unsigned int buildPacket(byte* packet)
     /* Insert the temperature readings */
     addFloat(packet, interiorTemperature1, index);
     addFloat(packet, interiorTemperature2, index);
+    addFloat(packet, interiorTemperature3, index);
     addFloat(packet, exteriorTemperature, index);
 
     /* Insert the pressure and humidity readings */
@@ -21,25 +22,19 @@ unsigned int buildPacket(byte* packet)
     addFloat(packet, humidity, index);
 
     /* Add the GPS data */
-    addUnsignedLong(packet, gpsTime, index);
-    addUnsignedLong(packet, gpsDate, index);
-    addUnsignedLong(packet, rawAltitude, index);
-    addFloat(packet, ascentRate, index);
+    addByte(packet, year, index);
+    addByte(packet, month, index);
+    addByte(packet, date, index);
+    addByte(packet, hour, index);
+    addByte(packet, minute, index);
+    addByte(packet, second, index);
+    addLong(packet, latitude, index);
+    addLong(packet, longitude, index);
+    addLong(packet, altitude, index);
+    addUnsignedLong(packet, speed, index);
+    addUnsignedInt(packet, heading, index);
+    addByte(packet, satellites, index);
     
-    addUnsignedInt(packet, rawLatitudeDegrees, index);
-    addUnsignedLong(packet, rawLatitudeBillionths, index);
-    addByte(packet, rawLatitudeSign, index);
-    
-    addUnsignedInt(packet, rawLongitudeDegrees, index);
-    addUnsignedLong(packet, rawLongitudeBillionths, index);
-    addByte(packet, rawLongitudeSign, index);
-
-    addBoolean(packet, gpsValidity, index);
-    addUnsignedLong(packet, gpsSentences, index);
-    addUnsignedLong(packet, failedSentences, index);
-    addUnsignedInt(packet, numSatellites, index);
-    addFloat(packet, payloadSpeed, index);
-
     /* Insert the IMU sensor readings */
     addFloat(packet, ax, index);
     addFloat(packet, ay, index);
@@ -102,6 +97,19 @@ void addUnsignedLong(byte* packet, unsigned long x, unsigned int& index)
     index += 4;
 }
 
+void addLong(byte* packet, long x, unsigned int& index)
+{
+    union 
+    {
+        long value;
+        byte bytes[4];
+    } converter;
+
+    converter.value = x;
+    memcpy(packet + index, converter.bytes, 4);
+    index += 4;
+}
+
 void addUnsignedInt(byte* packet, unsigned int x, unsigned int& index)
 {
     union 
@@ -127,4 +135,3 @@ void addInt(byte* packet, int x, unsigned int& index)
     memcpy(packet + index, converter.bytes, 2);
     index += 2;
 }
-
