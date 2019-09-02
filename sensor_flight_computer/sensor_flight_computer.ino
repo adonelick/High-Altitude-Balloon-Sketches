@@ -19,7 +19,7 @@
 #define COMM_COMPUTER_PORT Serial1
 
 /* Calibration constants */
-#define VOLTAGE_ADJUSTMENT 1.0
+#define VOLTAGE_ADJUSTMENT 1.05806
 #define RATE_X 0.0
 #define RATE_Y 0.0
 #define RATE_Z 0.0
@@ -125,7 +125,7 @@ void setup()
 {   
     /* Start the serial communication lines */
     DEBUG_PORT.begin(115200);
-    COMM_COMPUTER_PORT.begin(9600);
+    COMM_COMPUTER_PORT.begin(115200);
     GPS_PORT.begin(4800);
 
     /* Start the I2C bus */

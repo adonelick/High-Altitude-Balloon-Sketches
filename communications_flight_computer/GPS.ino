@@ -24,6 +24,13 @@
             speed = buffer_to_uint32(&gps_data[18]);
             heading = buffer_to_uint16(&gps_data[22]);
             satellites = (uint8_t) gps_data[24];
+
+            DEBUG_PORT.print("Updated GPS position: ");
+            DEBUG_PORT.print(latitude);
+            DEBUG_PORT.print(", ");
+            DEBUG_PORT.print(longitude);
+            DEBUG_PORT.print(", ");
+            DEBUG_PORT.println(altitude);
         }
     } else {
         while (GPS_PORT.available() > 0)
