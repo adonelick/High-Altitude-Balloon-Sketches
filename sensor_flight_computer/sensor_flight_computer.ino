@@ -205,8 +205,6 @@ void loop()
      */
     get_GPS_data();
     radioTransmitting |= (digitalRead(TRANSMISSION_PIN) == HIGH);
-    getAscentRate();
-
 
     /* Update the IMU sensor readings */
     if ( imu.gyroAvailable() ) {
@@ -247,9 +245,9 @@ void loop()
         logData(dataFile);
         dataFile.close();
 
-        totalDataFile.open();
-        logData(totalDataFile);
-        totalDataFile.close();  
+//        totalDataFile.open();
+//        logData(totalDataFile);
+//        totalDataFile.close();  
     }
 
     /* Determine whether or not we need to send out another update
@@ -259,8 +257,9 @@ void loop()
     {
         numBytes = buildPacket(data);
         COMM_COMPUTER_PORT.write(data, numBytes);
-        
-        displayData();
+        DEBUG_PORT.print("Wrote ");
+        DEBUG_PORT.print(numBytes);
+        DEBUG_PORT.println(" bytes to the communications computer");
         previousReportTime = millis();
     }
 

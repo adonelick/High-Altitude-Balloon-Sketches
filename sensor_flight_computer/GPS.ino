@@ -30,6 +30,26 @@
         {
             GPS_PORT.read();
         }
+        
+        byte gps_data[25];
+        size_t numBytes = GPS_PORT.readBytes(gps_data, 25);
+
+        if (numBytes > 0)
+        {
+            year = (uint8_t) gps_data[0];
+            month = (uint8_t) gps_data[1];
+            date = (uint8_t) gps_data[2];
+            hour = (uint8_t) gps_data[3];
+            minute = (uint8_t) gps_data[4];
+            second = (uint8_t) gps_data[5];
+
+            latitude = buffer_to_int32(&gps_data[6]);
+            longitude = buffer_to_int32(&gps_data[10]);
+            altitude = buffer_to_int32(&gps_data[14]);
+            speed = buffer_to_uint32(&gps_data[18]);
+            heading = buffer_to_uint16(&gps_data[22]);
+            satellites = (uint8_t) gps_data[24];
+        }
     }
  }
 

@@ -21,6 +21,7 @@ void setup()
     DEBUG_PORT.begin(4800);
     while (!DEBUG_PORT) {}
     gpsPort.begin( 4800 );
+    delay(2000);
 }
 
 void loop() 

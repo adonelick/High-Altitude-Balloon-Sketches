@@ -8,6 +8,7 @@ void receiveSensorData()
 
         if (numBytes > 0)
         {
+            sensor_data_received = true;
             for (size_t i = 0; i < numBytes; ++i)
             {
                 dataPacket.addByte(sensor_data[i]);
@@ -68,6 +69,7 @@ void sendPacket(Packet& packet, byte packetType, HardwareSerial& radio)
     DEBUG_PORT.print("Sending ");
     DEBUG_PORT.print(numBytes);
     DEBUG_PORT.println(" bytes over the radio");
+    print_buffer(kissBytes, numBytes);
 
     digitalWrite(TRANSMISSION_PIN, HIGH);
     radio.write(kissBytes, numBytes);

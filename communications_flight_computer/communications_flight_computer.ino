@@ -18,7 +18,7 @@
 
 // Settings for using the two radios
 #define USE_RADIO_1 false
-#define USE_RADIO_2 falseU
+#define USE_RADIO_2 false
 
 // Pin assignments for the relays
 #define RELAY_1 25
@@ -39,9 +39,10 @@ Packet ackPacket;
 unsigned int dataPacketBytes;
 unsigned int commandPacketBytes;
 unsigned int kissPacketBytes;
+bool sensor_data_received;
 
 /* Data reporting variables */
-unsigned long transmissionRate = 10000;
+unsigned long transmissionRate = 20000;
 unsigned long previousReportTime = 0;
 unsigned long lastDataArrival = 0;
 
@@ -102,5 +103,6 @@ void loop()
 
         /* Clear out the data packet for the next report */
         dataPacket.clear();
+        sensor_data_received = false;
     }
 }

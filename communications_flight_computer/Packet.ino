@@ -35,7 +35,15 @@ void updateDataPacket()
         int value;
         byte bytes[2];
     } intConverter;
-    
+
+
+    if (!sensor_data_received)
+    {
+        for (size_t i = 0; i < NUM_SENSOR_DATA_BYTES; ++i)
+        {
+            dataPacket.addByte(0);
+        }
+    }
     
     /* Add the time since last data update */
     ulongConverter.value = millis() - lastDataArrival;
